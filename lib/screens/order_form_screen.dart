@@ -32,7 +32,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   bool isLoading = false;
 
-  // 📄 PDF GENERATE
   Future<File> generatePdf() async {
     final pdf = pw.Document();
 
@@ -43,15 +42,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           children: [
             pw.Text("Anthurium Order", style: pw.TextStyle(fontSize: 22)),
             pw.SizedBox(height: 10),
-
             pw.Text("Plant: ${widget.plant.name}"),
             pw.Text("Category: ${widget.category}"),
             pw.Text("Size: ${widget.size}"),
             pw.Text("Quantity: ${widget.quantity}"),
-
             pw.SizedBox(height: 10),
-
-            pw.Text("Customer Name: ${nameController.text}"),
+            pw.Text("Customer: ${nameController.text}"),
             pw.Text("Phone: ${phoneController.text}"),
             pw.Text("Address: ${addressController.text}"),
           ],
@@ -66,20 +62,18 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     return file;
   }
 
-  // 📲 WhatsApp
   Future<void> sendWhatsApp() async {
-
     String message = """
 📦 නව ඇණවුමක්!
 
-🌸 නම: ${widget.plant.name}
-🪴 වර්ගය: ${widget.category}
-📏 ප්‍රමාණය: ${widget.size}
-🔢 ගණන: ${widget.quantity}
+🌸 ${widget.plant.name}
+🪴 ${widget.category}
+📏 ${widget.size}
+🔢 Qty: ${widget.quantity}
 
-👤 නම: ${nameController.text}
-📞 දුරකථන: ${phoneController.text}
-🏠 ලිපිනය: ${addressController.text}
+👤 ${nameController.text}
+📞 ${phoneController.text}
+🏠 ${addressController.text}
 """;
 
     String phone = "94750979908";
@@ -89,9 +83,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     await launchUrl(Uri.parse(url));
   }
 
-  // ✅ CONFIRM
   void confirmOrder() async {
-
     if (nameController.text.isEmpty ||
         phoneController.text.isEmpty ||
         addressController.text.isEmpty) {
@@ -130,96 +122,113 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   Color(0xFF14532D),
                   Color(0xFF16A34A),
                 ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
               ),
             ),
           ),
 
           SafeArea(
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(16),
               child: Column(
                 children: [
 
-                  // 🔙 Back
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
+                  // 🔝 HEADER
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Spacer(),
+                        Text(
+                          "Order Details 🛒",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Spacer(),
+                        SizedBox(width: 40),
+                      ],
                     ),
                   ),
 
-                  // 💎 AUTO DETAILS CARD
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.2)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            Text("📦 ඔබ තෝරාගත් පැළය",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-
-                            SizedBox(height: 10),
-
-                            Text("🌸 නම: ${widget.plant.name}",
-                                style: TextStyle(color: Colors.white70)),
-                            Text("🪴 වර්ගය: ${widget.category}",
-                                style: TextStyle(color: Colors.white70)),
-                            Text("📏 ප්‍රමාණය: ${widget.size}",
-                                style: TextStyle(color: Colors.white70)),
-                            Text("🔢 ගණන: ${widget.quantity}",
-                                style: TextStyle(color: Colors.white70)),
-                          ],
-                        ),
+                  // 📸 PLANT PREVIEW
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16),
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      image: DecorationImage(
+                        image: AssetImage(widget.plant.image),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
 
-                  SizedBox(height: 20),
-
-                  // 📝 FORM
-                  buildInput("👤 නම", nameController),
                   SizedBox(height: 15),
 
-                  buildInput("📞 දුරකථන අංකය", phoneController),
+                  // 💎 AUTO DETAILS
+                  buildGlassCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        Text("📦 ඔබ තෝරාගත් පැළය",
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+
+                        SizedBox(height: 10),
+
+                        Text("🌸 ${widget.plant.name}", style: TextStyle(color: Colors.white70)),
+                        Text("🪴 ${widget.category}", style: TextStyle(color: Colors.white70)),
+                        Text("📏 ${widget.size}", style: TextStyle(color: Colors.white70)),
+                        Text("🔢 Qty: ${widget.quantity}", style: TextStyle(color: Colors.white70)),
+                      ],
+                    ),
+                  ),
+
                   SizedBox(height: 15),
 
-                  buildInput("🏠 ලිපිනය", addressController),
+                  // 📝 FORM CARD
+                  buildGlassCard(
+                    child: Column(
+                      children: [
+                        buildInput("👤 නම", nameController),
+                        SizedBox(height: 12),
+                        buildInput("📞 දුරකථන", phoneController),
+                        SizedBox(height: 12),
+                        buildInput("🏠 ලිපිනය", addressController),
+                      ],
+                    ),
+                  ),
 
-                  SizedBox(height: 30),
+                  SizedBox(height: 25),
 
                   // 🛒 BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : confirmOrder,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : confirmOrder,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                         ),
+                        child: isLoading
+                            ? CircularProgressIndicator(color: Colors.green)
+                            : Text("Confirm Order 🚀"),
                       ),
-                      child: isLoading
-                          ? CircularProgressIndicator(color: Colors.green)
-                          : Text("Confirm Order 🛒"),
                     ),
-                  )
+                  ),
+
+                  SizedBox(height: 30),
                 ],
               ),
             ),
@@ -229,7 +238,30 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     );
   }
 
-  // ✨ Custom Input Field
+  // 💎 Glass Card
+  Widget buildGlassCard({required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ✨ Input
   Widget buildInput(String hint, TextEditingController controller) {
     return TextField(
       controller: controller,

@@ -15,23 +15,15 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<String> categories = [
-    "Livium",
-    "Jaguwar",
-    "Rainbow",
-    "Lili",
-    "Million",
-    "Ceuro",
-    "Bambino Red",
-    "Cardinal",
-    "Black Love",
-    "Cirano",
+    "Livium","Jaguwar","Rainbow","Lili","Million",
+    "Ceuro","Bambino Red","Cardinal","Black Love","Cirano",
   ];
 
   int selectedIndex = 0;
+  String searchQuery = "";
 
-  // 🔄 Refresh
   Future<void> refreshData() async {
-    setState(() {}); // rebuild (stream auto refresh)
+    setState(() {});
     await Future.delayed(const Duration(seconds: 1));
   }
 
@@ -53,8 +45,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Color(0xFF14532D),
                   Color(0xFF16A34A),
                 ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
               ),
             ),
           ),
@@ -63,46 +53,80 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               children: [
 
-                // 💎 HEADER WITH PROFILE
+                // 💎 HEADER
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
 
-                      const Text(
-                        "Anthurium Shop 🌸",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                      const Expanded(
+                        child: Text(
+                          "Anthurium Shop 🌸",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
 
-                      // 👤 PROFILE ICON
                       GestureDetector(
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProfileScreen()),
-    );
-  },
-  child: CircleAvatar(
-    backgroundColor: Colors.white,
-    child: Icon(Icons.person, color: Colors.green),
-  ),
-)
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => ProfileScreen()),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.4),
+                                blurRadius: 8,
+                              )
+                            ],
+                          ),
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.person, color: Colors.green),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
 
-                // 🪴 Categories
+                // 🔍 SEARCH BAR
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() => searchQuery = value.toLowerCase());
+                    },
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "Search plants...",
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      prefixIcon: const Icon(Icons.search, color: Colors.white),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.1),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // 🪴 CATEGORY CHIPS
                 SizedBox(
                   height: 50,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: categories.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     itemBuilder: (context, index) {
 
                       bool isSelected = selectedIndex == index;
@@ -113,9 +137,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             selectedIndex = index;
                           });
                         },
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
                           margin: const EdgeInsets.symmetric(horizontal: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? Colors.white
@@ -138,7 +163,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 10),
 
-                // 🔥 FIRESTORE GRID + REFRESH
+                // 🌸 GRID
                 Expanded(
                   child: StreamBuilder<List<Plant>>(
                     stream: FirestoreService().getPlants(),
@@ -152,30 +177,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                       if (snapshot.hasError) {
                         return const Center(
-                          child: Text(
-                            "Error loading data ❌",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          child: Text("Error ❌", style: TextStyle(color: Colors.white)),
                         );
                       }
 
                       List<Plant> allPlants = snapshot.data ?? [];
 
                       List<Plant> plants = allPlants
-                          .where((p) => p.category == selectedCategory)
+                          .where((p) =>
+                              p.category == selectedCategory &&
+                              p.name.toLowerCase().contains(searchQuery))
                           .toList();
 
                       if (plants.isEmpty) {
                         return const Center(
                           child: Text(
-                            "No plants available 😢",
-                            style: TextStyle(color: Colors.white),
+                            "No plants found 🌿",
+                            style: TextStyle(color: Colors.white70),
                           ),
                         );
                       }
 
                       return RefreshIndicator(
-                        color: Colors.green,
                         onRefresh: refreshData,
                         child: GridView.builder(
                           physics: const AlwaysScrollableScrollPhysics(),
@@ -191,35 +214,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                             final plant = plants[index];
 
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PlantDetailScreen(
-                                      plant: plant,
-                                      category: selectedCategory,
-                                    ),
-                                  ),
+                            return TweenAnimationBuilder(
+                              tween: Tween(begin: 0.9, end: 1.0),
+                              duration: const Duration(milliseconds: 300),
+                              builder: (context, scale, child) {
+                                return Transform.scale(
+                                  scale: scale as double,
+                                  child: child,
                                 );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
-                                    )
-                                  ],
-                                ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => PlantDetailScreen(
+                                        plant: plant,
+                                        category: selectedCategory,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
                                   child: Stack(
                                     children: [
 
-                                      // 📸 Image
                                       Positioned.fill(
                                         child: Image.asset(
                                           plant.image,
@@ -227,23 +247,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         ),
                                       ),
 
-                                      // 🌑 Overlay
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.black.withOpacity(0.1),
-                                                Colors.black.withOpacity(0.7),
-                                              ],
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                            ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.black.withOpacity(0.1),
+                                              Colors.black.withOpacity(0.7),
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
                                           ),
                                         ),
                                       ),
 
-                                      // 📄 Details
                                       Positioned(
                                         bottom: 10,
                                         left: 10,
@@ -257,17 +273,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 16,
                                               ),
                                             ),
-
-                                            const SizedBox(height: 5),
 
                                             Text(
                                               plant.prices["Small"] ?? "",
                                               style: const TextStyle(
                                                 color: Colors.greenAccent,
-                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ],
