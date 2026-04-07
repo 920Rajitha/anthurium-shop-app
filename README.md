@@ -1,17 +1,38 @@
-# anthurium_app
+# 🌸 Anthurium Plant Shop App
 
-A new Flutter project.
+A modern Flutter-based mobile application for browsing, managing, and ordering anthurium plants with real-time updates powered by Firebase. 🚀
 
-## Getting Started
+## 📱 Features
 
-This project is a starting point for a Flutter application.
+✨ Beautiful modern UI (Glass Design)  
+🪴 Browse plants by categories (Livium, Jaguwar, Rainbow, etc.)  
+📄 Detailed plant view with Sinhala descriptions 🇱🇰  
+📏 Select plant size (Small / Medium / Big)  
+🔢 Choose quantity before ordering  
+📦 Real-time stock display  
+📲 Order via WhatsApp integration  
+☁️ Live data updates using Firebase Firestore  
+🧑‍💻 Admin panel to add new plants dynamically  
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Tech Stack
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- 🧱 Flutter (Frontend)
+- ☁️ Firebase Firestore (Realtime Database)
+- 🔐 Firebase Authentication
+- 📦 Dart
+- 📲 URL Launcher (WhatsApp Integration)
+- 📄 PDF Generation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📸 Screens
+
+- 🔐 Login / Signup (Glass UI)
+- 🏠 Dashboard (Categories + Grid)
+- 🌸 Plant Details Page
+- 🛒 Order Form (Auto-filled)
+- 🧑‍💻 Admin Panel (Add Plants)
+
+## ⚙️ Setup Instructions
+
+1️⃣ Clone the repository  
+```bash
+git clone https://github.com/920Rajitha/anthurium-shop-app.git
